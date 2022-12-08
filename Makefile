@@ -48,6 +48,23 @@ compile-all:
 update:
 	git pull
 
+
+check-venv:
+	@if [ -z "$(VIRTUAL_ENV)" ]; then \
+		echo "No virtual environment is active."; \
+		exit 127; \
+	fi
+
+antlr3_python3_runtime_3.4:
+	wget -q -O - https://download.tuxfamily.org/taste/antlr3_python3_runtime_3.4.tar.bz2 | tar jxpvf -
+
+
+requirements.txt: requirements.in antlr3_python3_runtime_3.4
+	$(MAKE) check-venv
+	pip install pip-tools
+	pip-compile requirements.in
+	pip-sync
+
 dependencies:
 	sudo apt install -y python3 python3-pip libgl1 gnat python3-pexpect
 	# installing pyside6 through pip because of bugs with QML in the Debian bullseye release

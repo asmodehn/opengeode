@@ -21,6 +21,21 @@ pep517==0.13.0
     # via build
 pip-tools==6.11.0
     # via -r requirements.in
+pygraphviz==1.7
+    # via -r requirements.in
+pyside6==6.4.1
+    # via -r requirements.in
+pyside6-addons==6.4.1
+    # via pyside6
+pyside6-essentials==6.4.1
+    # via
+    #   pyside6
+    #   pyside6-addons
+shiboken6==6.4.1
+    # via
+    #   pyside6
+    #   pyside6-addons
+    #   pyside6-essentials
 tomli==2.0.1
     # via
     #   build

@@ -88,7 +88,7 @@ system-dependencies: antlr3_python3_runtime_3.4
 #	echo [-] IMPORTANT: Make sure that ~/.local/bin is in your PATH
 
 pyinstall: requirements.txt opengeode/icons.py
-	@python3 -m pip install --upgrade .
+	@python3 -m pip install --edit .
 
 #install:
 #	PATH=~/.local/bin:"${PATH}" pyside6-rcc opengeode.qrc -o opengeode/icons.py && python3 -m pip install --user --upgrade .

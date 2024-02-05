@@ -48,22 +48,50 @@ compile-all:
 update:
 	git pull
 
-dependencies:
-	sudo apt install -y python3 python3-pip libgl1 gnat python3-pexpect
-	# installing pyside6 through pip because of bugs with QML in the Debian bullseye release
-	python3 -m pip install --user --upgrade pyside6
-	# python3-antlr3 runtime is not available in any official repo, taking in from TASTE
-	cd /tmp ; wget -q -O - https://download.tuxfamily.org/taste/antlr3_python3_runtime_3.4.tar.bz2 | tar jxpvf - ; cd antlr3_python3_runtime_3.4 ; python3 -m pip install --user --upgrade .
-	sudo apt install -y python3-pygraphviz
-	sudo apt install -y python3-stringtemplate3
-	sudo apt install -y python3-singledispatch
-	# install ASN1SCC in ~/.local/bin
-	mkdir -p ~/.local/bin
-	cd ~/.local ; wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.5.0.0/asn1scc-bin-4.5.0.0.tar.bz2 | tar jxpvf - ; cd bin ; ln -s ../asn1scc/* .
-	echo [-] IMPORTANT: Make sure that ~/.local/bin is in your PATH
 
-install:
-	PATH=~/.local/bin:"${PATH}" pyside6-rcc opengeode.qrc -o opengeode/icons.py && python3 -m pip install --user --upgrade .
+check-venv:
+	@if [ -z "$(VIRTUAL_ENV)" ]; then \
+		echo "No virtual environment is active."; \
+		exit 127; \
+	fi
+
+antlr3_python3_runtime_3.4:
+	wget -q -O - https://download.tuxfamily.org/taste/antlr3_python3_runtime_3.4.tar.bz2 | tar jxpvf -
+
+
+requirements.txt: requirements.in system-dependencies
+	$(MAKE) check-venv
+	pip install pip-tools
+	pip-compile requirements.in
+	# as soon as we have a requirement.txt, we install everything... can we do better ?
+	pip-sync
+
+opengeode/icons.py: opengeode.qrc
+	pyside6-rcc opengeode.qrc -o opengeode/icons.py
+
+
+system-dependencies: antlr3_python3_runtime_3.4
+	sudo apt install graphviz graphviz-dev
+
+#dependencies:
+#	sudo apt install -y python3 python3-pip libgl1 gnat python3-pexpect
+#	# installing pyside6 through pip because of bugs with QML in the Debian bullseye release
+#	python3 -m pip install --user --upgrade pyside6
+#	# python3-antlr3 runtime is not available in any official repo, taking in from TASTE
+#	cd /tmp ; wget -q -O - https://download.tuxfamily.org/taste/antlr3_python3_runtime_3.4.tar.bz2 | tar jxpvf - ; cd antlr3_python3_runtime_3.4 ; python3 -m pip install --user --upgrade .
+#	sudo apt install -y python3-pygraphviz
+#	sudo apt install -y python3-stringtemplate3
+#	sudo apt install -y python3-singledispatch
+#	# install ASN1SCC in ~/.local/bin
+#	mkdir -p ~/.local/bin
+#	cd ~/.local ; wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.5.0.0/asn1scc-bin-4.5.0.0.tar.bz2 | tar jxpvf - ; cd bin ; ln -s ../asn1scc/* .
+#	echo [-] IMPORTANT: Make sure that ~/.local/bin is in your PATH
+
+pyinstall: requirements.txt opengeode/icons.py
+	@python3 -m pip install --edit .
+
+#install:
+#	PATH=~/.local/bin:"${PATH}" pyside6-rcc opengeode.qrc -o opengeode/icons.py && python3 -m pip install --user --upgrade .
 
 full-install: update
 	$(MAKE) dependencies

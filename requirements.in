@@ -1,0 +1,4 @@
+pip-tools
+-e antlr3_python3_runtime_3.4
+pyside6
+pygraphviz
